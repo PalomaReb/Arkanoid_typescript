@@ -5,9 +5,9 @@ export class Ball{
  private ballImage : HTMLImageElement = new Image();
  
  constructor(
+    speed: number,
      private ballSize:number,
      private position:Vector,
-     speed: number,
      image:string,
  ){
      this.ballSize=ballSize;
