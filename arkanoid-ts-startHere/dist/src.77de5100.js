@@ -250,7 +250,104 @@ function () {
 }();
 
 exports.CanvasView = CanvasView;
-},{"~/sprites/Brick":"sprites/Brick.ts"}],"images/brick-red.png":[function(require,module,exports) {
+},{"~/sprites/Brick":"sprites/Brick.ts"}],"sprites/Paddle.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Paddle = void 0;
+
+var Paddle =
+/** @class */
+function () {
+  function Paddle(speed, paddleWidth, paddlHeight, position, image) {
+    var _this = this;
+
+    this.speed = speed;
+    this.paddleWidth = paddleWidth;
+    this.paddlHeight = paddlHeight;
+    this.position = position;
+    this.paddleImage = new Image();
+
+    this.handleKeyUp = function (e) {
+      if (e.code === "ArrowLeft" || e.key === "ArrowLeft") _this.moveLeft = false;
+      if (e.code === "ArrowRight" || e.key === "ArrowRight") _this.moveRight = false;
+    };
+
+    this.handleKeyDown = function (e) {
+      if (e.code === "ArrowLeft" || e.key === "ArrowLeft") _this.moveLeft = true;
+      if (e.code === "ArrowRight" || e.key === "ArrowRight") _this.moveRight = true;
+    };
+
+    this.speed = speed;
+    this.paddleWidth = paddleWidth;
+    this.paddlHeight = paddlHeight;
+    this.position = position;
+    this.moveLeft = false;
+    this.moveRight = false;
+    this.paddleImage.src = image; //Event listeners
+
+    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keyup', this.handleKeyUp);
+  }
+
+  Object.defineProperty(Paddle.prototype, "width", {
+    //Getters
+    get: function get() {
+      return this.paddleWidth;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Paddle.prototype, "height", {
+    get: function get() {
+      return this.paddlHeight;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Paddle.prototype, "pos", {
+    get: function get() {
+      return this.position;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Paddle.prototype, "image", {
+    get: function get() {
+      return this.paddleImage;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Paddle.prototype, "isMovingLeft", {
+    get: function get() {
+      return this.moveLeft;
+    },
+    enumerable: false,
+    configurable: true
+  });
+  Object.defineProperty(Paddle.prototype, "isMovingRight", {
+    get: function get() {
+      return this.moveRight;
+    },
+    enumerable: false,
+    configurable: true
+  });
+
+  Paddle.prototype.movePaddle = function () {
+    if (this.moveLeft) this.pos.x -= this.speed;
+    if (this.moveRight) this.pos.x += this.speed;
+  };
+
+  return Paddle;
+}();
+
+exports.Paddle = Paddle;
+},{}],"images/paddle.png":[function(require,module,exports) {
+module.exports = "/paddle.f48d929a.png";
+},{}],"images/brick-red.png":[function(require,module,exports) {
 module.exports = "/brick-red.c1be1822.png";
 },{}],"images/brick-blue.png":[function(require,module,exports) {
 module.exports = "/brick-blue.695b92f9.png";
@@ -376,8 +473,18 @@ function createBricks() {
 
 var _CanvasView = require("./view/CanvasView");
 
+var _Paddle = require("./sprites/Paddle");
+
+var _paddle = _interopRequireDefault(require("./images/paddle.png"));
+
+var _setup = require("./setup");
+
 var _helpers = require("./helpers");
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+//images
+//level and colors
 //Helpers
 var gameOver = false;
 var score = 0;
@@ -392,11 +499,17 @@ function setGameWin(view) {
   gameOver = false;
 }
 
-function gameLoop(view, bricks) {
+function gameLoop(view, bricks, paddle) {
   view.clear();
   view.drawBricks(bricks);
+  view.drawSprite(paddle); //move paddle and check so it wont exit playfield
+
+  if (paddle.isMovingLeft && paddle.pos.x > 0 || paddle.isMovingRight && paddle.pos.x < view.canvas.width - paddle.width) {
+    paddle.movePaddle();
+  }
+
   requestAnimationFrame(function () {
-    return gameLoop(view, bricks);
+    return gameLoop(view, bricks, paddle);
   });
 }
 
@@ -406,14 +519,19 @@ function startGame(view) {
   view.drawInfo('');
   view.drawScore(0); //create all bricks
 
-  var bricks = (0, _helpers.createBricks)();
-  gameLoop(view, bricks);
+  var bricks = (0, _helpers.createBricks)(); //create a paddle
+
+  var paddle = new _Paddle.Paddle(_setup.PADDLE_SPEED, _setup.PADDLE_WIDTH, _setup.PADDLE_HEIGHT, {
+    x: _setup.PADDLE_STARTX,
+    y: view.canvas.height - _setup.PADDLE_HEIGHT - 5
+  }, _paddle.default);
+  gameLoop(view, bricks, paddle);
 } //create a new view
 
 
 var view = new _CanvasView.CanvasView('#playField');
 view.initStartButton(startGame);
-},{"./view/CanvasView":"view/CanvasView.ts","./helpers":"helpers.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./view/CanvasView":"view/CanvasView.ts","./sprites/Paddle":"sprites/Paddle.ts","./images/paddle.png":"images/paddle.png","./setup":"setup.ts","./helpers":"helpers.ts"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
